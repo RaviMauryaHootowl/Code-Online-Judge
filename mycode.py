@@ -1,2 +1,2 @@
-person = input()
-print(person + ", How are you?")
+text = input()
+print(tex)
