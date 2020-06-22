@@ -1,1 +1,2 @@
-print("lol")
+person = input()
+print(person + ", How are you?")

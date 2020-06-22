@@ -57,10 +57,9 @@
     }
 
     document.querySelector('.runBtn').onclick = () => {
-      alert(editor.getValue());
       postData('http://localhost:5000/api/code', { code: editor.getValue() })
         .then(data => {
-          alert(data['stdout']);
+          alert(data);
           console.log(data);
         });
     }
