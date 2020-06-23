@@ -6,13 +6,22 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/api/code', methods =['POST'])
-def codeRun():
+@app.route('/api/submitcode', methods =['POST'])
+def codeSubmit():
   file1 = open("mycode.py","w")
   file1.write(request.get_json()['code'])
   file1.close()
   print(request.get_json())
-  os.system('python mycode.py < input.txt > output.txt')
+  #os.system('python mycode.py < input.txt > output.txt')
+  opt = ""
+  try:
+    opt = subprocess.check_output("python mycode.py < input.txt > output.txt", shell=True)                       
+  except subprocess.CalledProcessError as grepexc:                                                                                                   
+    opt = "<COMPILATION ERROR>"
+  
+  if opt == "<COMPILATION ERROR>":
+    return json.dumps({"status" : "COMPILATION ERROR"})
+  print("stdout : " + opt.decode("utf-8"))
 
   #checking code
   userOutputFile = open('output.txt', mode='r')
@@ -23,10 +32,36 @@ def codeRun():
   realOutputFile.close()
   if userOutput == realOutput:
     print('PASSED!')
-    return json.dumps({"stdout" : "Tests PASSED!"})
+    return json.dumps({"status" : "PASSED"})
   else:
     print('FAILED!')
-    return json.dumps({"stdout" : "Tests FAILED!"})
+    return json.dumps({"status" : "FAILED"})
+
+@app.route('/api/runcode', methods =['POST'])
+def codeRun():
+  file1 = open("mycode.py","w")
+  file1.write(request.get_json()['code'])
+  file1.close()
+  print(request.get_json())
+  
+  customInputFile = open("customInput.txt","w")
+  customInputFile.write(request.get_json()['inputTest'])
+  customInputFile.close()
+  #os.system('python mycode.py < input.txt > output.txt')
+  opt = ""
+  try:
+    opt = subprocess.check_output("python mycode.py < customInput.txt > output.txt", shell=True)                       
+  except subprocess.CalledProcessError as grepexc:                                                                                                   
+    opt = "<COMPILATION ERROR>"
+  
+  if opt == "<COMPILATION ERROR>":
+    return json.dumps({"status" : "COMPILATION ERROR", "output" : ""})
+  print("stdout : " + opt.decode("utf-8"))
+
+  #checking code
+  userOutputFile = open('output.txt', mode='r')
+  userOutput = userOutputFile.read().strip()
+  return json.dumps({"status" : "PASSED", "output" : userOutput})
 
 if __name__ == '__main__':
   app.run()
