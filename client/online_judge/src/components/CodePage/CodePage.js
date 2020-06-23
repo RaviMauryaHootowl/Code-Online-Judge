@@ -40,7 +40,11 @@ const CodePage = () => {
         </div>
       </div>
       <div className= "rightPane">
-        <AceEditor onChange={(newValue) => setCode(newValue)} value={code} fontSize={20} mode="python" theme="dracula" width="100%div" height="100vh"/>
+        <div className="editorHeader">
+          <span>Code Editor</span>
+          <span className="editorLang">Python</span>
+        </div>
+        <AceEditor onChange={(newValue) => setCode(newValue)} value={code} fontSize={20} mode="python" theme="dracula" width="100%" height="100%"/>
       </div>
     </div>
   );
