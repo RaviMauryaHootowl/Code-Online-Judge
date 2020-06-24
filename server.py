@@ -6,19 +6,74 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/api/submitcode', methods =['POST'])
-def codeSubmit():
-  file1 = open("mycode.py","w")
-  file1.write(request.get_json()['code'])
-  file1.close()
-  print(request.get_json())
-  #os.system('python mycode.py < input.txt > output.txt')
+def cppCodeRunner(cppCode):
+  cppCodeFile = open("mycode.cpp", "w")
+  cppCodeFile.write(cppCode)
+  cppCodeFile.close()
+
   opt = ""
   try:
-    opt = subprocess.check_output("python mycode.py < input.txt > output.txt", shell=True)                       
+    opt = subprocess.check_output("g++ mycode.cpp -o mycodecpp", shell=True)    
+    opt = subprocess.check_output("./mycodecpp < customInput.txt > output.txt", shell=True)                   
   except subprocess.CalledProcessError as grepexc:                                                                                                   
     opt = "<COMPILATION ERROR>"
   
+  return opt
+
+
+def pythonCodeRunner(pyCode):
+  pyCodeFile = open("mycode.py", "w")
+  pyCodeFile.write(pyCode)
+  pyCodeFile.close()
+
+  opt = ""
+  try:
+    opt = subprocess.check_output("python3 mycode.py < customInput.txt > output.txt", shell=True)                       
+  except subprocess.CalledProcessError as grepexc:                                                                                                   
+    opt = "<COMPILATION ERROR>"
+
+  return opt
+
+
+def cppSubmitRunner(cppCode):
+  cppCodeFile = open("mycode.cpp", "w")
+  cppCodeFile.write(cppCode)
+  cppCodeFile.close()
+
+  opt = ""
+  try:
+    opt = subprocess.check_output("g++ mycode.cpp -o mycodecpp", shell=True)    
+    opt = subprocess.check_output("./mycodecpp < input.txt > output.txt", shell=True)                   
+  except subprocess.CalledProcessError as grepexc:                                                                                                   
+    opt = "<COMPILATION ERROR>"
+  
+  return opt
+
+
+def pythonSubmitRunner(pyCode):
+  pyCodeFile = open("mycode.py", "w")
+  pyCodeFile.write(pyCode)
+  pyCodeFile.close()
+
+  opt = ""
+  try:
+    opt = subprocess.check_output("python3 mycode.py < input.txt > output.txt", shell=True)                       
+  except subprocess.CalledProcessError as grepexc:                                                                                                   
+    opt = "<COMPILATION ERROR>"
+
+  return opt
+
+
+@app.route('/api/submitcode', methods =['POST'])
+def codeSubmit():
+  lang = request.get_json()['lang']
+
+  opt = ""
+  if lang == 'py':
+    opt = pythonSubmitRunner(request.get_json()['code'])
+  elif lang == 'cpp':
+    opt = cppSubmitRunner(request.get_json()['code'])
+
   if opt == "<COMPILATION ERROR>":
     return json.dumps({"status" : "COMPILATION ERROR"})
   print("stdout : " + opt.decode("utf-8"))
@@ -37,23 +92,21 @@ def codeSubmit():
     print('FAILED!')
     return json.dumps({"status" : "FAILED"})
 
+
 @app.route('/api/runcode', methods =['POST'])
 def codeRun():
-  file1 = open("mycode.py","w")
-  file1.write(request.get_json()['code'])
-  file1.close()
-  print(request.get_json())
-  
+  lang = request.get_json()['lang']
+
   customInputFile = open("customInput.txt","w")
   customInputFile.write(request.get_json()['inputTest'])
   customInputFile.close()
-  #os.system('python mycode.py < input.txt > output.txt')
+
   opt = ""
-  try:
-    opt = subprocess.check_output("python mycode.py < customInput.txt > output.txt", shell=True)                       
-  except subprocess.CalledProcessError as grepexc:                                                                                                   
-    opt = "<COMPILATION ERROR>"
-  
+  if lang == 'py':
+    opt = pythonCodeRunner(request.get_json()['code'])
+  elif lang == 'cpp':
+    opt = cppCodeRunner(request.get_json()['code'])
+
   if opt == "<COMPILATION ERROR>":
     return json.dumps({"status" : "COMPILATION ERROR", "output" : ""})
   print("stdout : " + opt.decode("utf-8"))
