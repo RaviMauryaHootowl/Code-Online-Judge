@@ -16,7 +16,7 @@ const CodePage = () => {
     "java" : "Java"
   }
   const aceLangs = {
-    "c" : "c",
+    "c" : "c_cpp",
     "cpp" : "c_cpp",
     "py" : "python",
     "java" : "java"
@@ -92,7 +92,7 @@ const CodePage = () => {
 
   const openLangSelector = () => {
     document.querySelector(`.${editorLang}`).className = `lang ${editorLang} selectedLang`;
-    document.querySelector(".langSelectorContainer").style.display = "flex";
+    document.querySelector(".langSelectorContainer").style.display = (document.querySelector(".langSelectorContainer").style.display == "flex") ? "none" : "flex";
   }
 
   return (
@@ -104,11 +104,11 @@ const CodePage = () => {
             Write a program to reverse a string.
             <div className="questionInput">
               <div className="questionInputHeader">Sample Input</div>
-              <div className="questionSampleInput">kush kaka</div>
+              <div className="questionSampleInput">code is fun</div>
             </div>
             <div className="questionOutput">
               <div className="questionOutputHeader">Sample Output</div>
-              <div className="questionSampleOutput">akak hsuk</div>
+              <div className="questionSampleOutput">nuf si edoc</div>
             </div>
           </div>
         </div>
